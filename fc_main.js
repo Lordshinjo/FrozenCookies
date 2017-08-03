@@ -1806,6 +1806,16 @@ function autoCookie() {
         }
 
         var itemBought = false;
+        
+        //Automatically buy in bulk if setting turned on
+        if (FrozenCookies.autoBulk != 0){
+            if (FrozenCookies.autoBulk == 1){ //Buy x10
+                Game.storeBulkButton(3);
+            }
+            if (FrozenCookies.autoBulk == 2){ //Buy x100
+                Game.storeBulkButton(4);
+            }
+        }
 
         if (FrozenCookies.autoBuy && (Game.cookies >= delay + recommendation.cost) && (FrozenCookies.pastemode || isFinite(nextChainedPurchase().efficiency))) {
             //    if (FrozenCookies.autoBuy && (Game.cookies >= delay + recommendation.cost)) {
