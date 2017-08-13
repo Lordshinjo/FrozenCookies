@@ -15,7 +15,13 @@
 // Github.io: http://lordshinjo.github.io/FrozenCookies/
 
 function LoadFrozenCookies() {
-    Game.LoadMod('https://rawgit.com/Lordshinjo/FrozenCookies/master/frozen_cookies.js');
+    window.setTimeout(function() {
+        if (Game.ready) {
+            Game.LoadMod('https://rawgit.com/Lordshinjo/FrozenCookies/master/frozen_cookies.js');
+        } else {
+            LoadFrozenCookies();
+        }
+    }, 500);
 }
 
 window.addEventListener("load", LoadFrozenCookies, false);
