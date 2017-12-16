@@ -15,9 +15,20 @@ FrozenCookies.preferenceValues = {
         'display':["Autoclick GC OFF", "Autoclick GC ON"],
         'default':0
     },
+    'stormLimit':{
+        'hint':'Choose rate of Golden Cookies clicked per second during Cookie Storms.',
+        'display':['Cookie Storm Limit OFF','Cookie Storm Limit ON'],
+        'default':0,
+        'extras':'<a class="option" id="cookieStormSpeed" onclick="updateSpeed(\'cookieStormSpeed\');">${cookieStormSpeed} clicks/sec</a>'
+    },
     'autoWrinkler':{
         'hint':'Automatically pop wrinklers efficiently or instantly.',
         'display':['Autopop Wrinklers OFF', 'Autopop Wrinklers Efficiently', 'Autopop Wrinklers Instantly'],
+        'default':0
+    },
+    'autoSL':{
+        'hint':'Automatically harvest sugar lumps when ripe.',
+        'display':["Autoharvest SL OFF", "Autoharvest SL ON"],
         'default':0
     },
     'autoReindeer':{
@@ -79,6 +90,11 @@ FrozenCookies.preferenceValues = {
         'default':0,
         'extras':'<a class="option" id="viewStats" onclick="viewStatGraphs();">View Stat Graphs</a>'
     },
+    'showAchievements':{
+        'hint':'Show achievement popups (Kind of broken early game)',
+        'display':['Achievement Popups OFF','Achievement Popups ON'],
+        'default':0
+    },
     'numberDisplay':{
         'hint':'Change how numbers are shortened',
         'display':["Raw Numbers","Full Word (million, billion)","Initials (M, B)","SI Units (M, G, T)", "Scientific Notation (6.3e12)"],
@@ -90,8 +106,8 @@ FrozenCookies.preferenceValues = {
         'default':0
     },
     'autoGodzamok':{
-        'hint':'Automatically sell all cursors during Dragonflight and Click Frenzy if you worship Godzamok',
-        'display':['Auto-Godzamok OFF','Auto-Godzamok ON'],
+        'hint':'Automatically sell all cursors during Dragonflight and Click Frenzy if you worship Godzamok ("Sane" prevents rapid buy/sell spam)',
+        'display':['Auto-Godzamok OFF','Auto-Godzamok ON','Auto-Godzamok ON (Sane)'],
         'default':0
     },
     'defaultSeason':{

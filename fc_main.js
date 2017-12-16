@@ -27,6 +27,7 @@ function setOverrides() {
     FrozenCookies.cookieClickSpeed = preferenceParse('cookieClickSpeed', 0);
     FrozenCookies.frenzyClickSpeed = preferenceParse('frenzyClickSpeed', 0);
     FrozenCookies.HCAscendAmount = preferenceParse('HCAscendAmount', 0);
+    FrozenCookies.cookieStormSpeed = preferenceParse('cookieStormSpeed', 0);
 
     // Becomes 0 almost immediately after user input, so default to 0
     FrozenCookies.timeTravelAmount = 0;
@@ -102,7 +103,7 @@ function setOverrides() {
     //  if (FrozenCookies.saveWrinklers && localStorage.wrinklers) {
     //    Game.wrinklers = JSON.parse(localStorage.wrinklers);
     //  }
-    Game.Win = fcWin;
+    if (!FrozenCookies.showAchievements) Game.Win = fcWin;
     Game.oldBackground = Game.DrawBackground;
     Game.DrawBackground = function() {
         Game.oldBackground();
@@ -1562,15 +1563,24 @@ function doTimeTravel() {
       }
     */
 }
-
+//Why the hell is fcWin being called so often? It seems to be getting called repeatedly on the CPS achievements, 
+//which should only happen when you actually win them?
 function fcWin(what) {
     if (typeof what === 'string') {
         if (Game.Achievements[what]) {
             if (Game.Achievements[what].won == 0) {
+                var achname=Game.Achievements[what].shortName?Game.Achievements[what].shortName:Game.Achievements[what].name;
                 Game.Achievements[what].won = 1;
+                //This happens a ton of times on CPS achievements; it seems like they would be CHECKED for, but a degbug message placed
+                //here gets repeatedly called seeming to indicate that the achievements.won value is 1, even though the achievement isn't
+                //being unlocked. This also means that placing a function to log the achievement spams out messages. Are the Achievement.won
+                //values being turned off before the game checks again? There must be some reason Game.Win is replaced with fcWin
                 if (!FrozenCookies.disabledPopups) {
                     logEvent('Achievement', 'Achievement unlocked :<br>' + Game.Achievements[what].name + '<br> ', true);
                 }
+                //if (FrozenCookies.showAchievements) {
+                //    Game.Notify('Achievement unlocked','<div class="title" style="font-size:18px;margin-top:-2px;">'+achname+'</div>',Game.Achievements[what].icon);
+                //}
                 if (Game.Achievements[what].pool != 'shadow') {
                     Game.AchievementsOwned++;
                 }
@@ -1578,6 +1588,7 @@ function fcWin(what) {
             }
         }
     } else {
+        logEvent('fcWin Else condition');
         for (var i in what) {
             Game.Win(what[i]);
         }
@@ -1720,7 +1731,8 @@ function autoGSBuy() {
 }
 
 function autoGodzamokAction() {
-    if (Game.hasGod('ruin') && Game.Objects['Cursor'].amount > 10 && hasClickBuff()) {
+    //Now has option to not trigger until current Devastation buff expires (i.e. won't rapidly buy & sell cursors throughout Godzamok duration)
+    if (Game.hasGod('ruin') && Game.Objects['Cursor'].amount > 10 && (!Game.hasBuff('Devastation') || FrozenCookies.autoGodzamok == 1) && hasClickBuff()) {
         Game.Objects['Cursor'].sell(Game.Objects['Cursor'].amount);
     }
 }
@@ -1771,6 +1783,13 @@ function autoCookie() {
         var delay = delayAmount();
         if (FrozenCookies.timeTravelAmount) {
             doTimeTravel();
+        }
+        if (FrozenCookies.autoSL) {
+             var started = Game.lumpT;
+             var ripeAge = Game.lumpRipeAge;
+             if ((Date.now() - started) >= ripeAge) {
+                 Game.clickLump();
+             }
         }
         if (FrozenCookies.autoWrinkler == 1) {
             var popCount = 0;
@@ -1847,10 +1866,15 @@ function autoCookie() {
 
         // This apparently *has* to stay here, or else fast purchases will multi-click it.
         if (goldenCookieLife() && FrozenCookies.autoGC) {
-            for (var i in Game.shimmers) {
-                if (Game.shimmers[i].type == 'golden') {
-                    Game.shimmers[i].pop();
+            if (!Game.hasBuff('Cookie storm') || FrozenCookies.stormLimit == 0) {
+                for (var i in Game.shimmers) {
+                    if (Game.shimmers[i].type == 'golden') {
+                        Game.shimmers[i].pop();
+                    }
                 }
+            }
+            if (Game.hasBuff('Cookie storm') && FrozenCookies.cookieStormSpeed > 0) {
+                setInterval(popOneGC, 1000/FrozenCookies.cookieStormSpeed);
             }
         }
         if (reindeerLife() > 0 && FrozenCookies.autoReindeer) {
@@ -1900,6 +1924,17 @@ function autoCookie() {
     }
 }
 
+function popOneGC() {
+    if (Game.hasBuff('Cookie storm')) {
+        for (var i in Game.shimmers) {
+            if (Game.shimmers[i].type == 'golden') {
+                Game.shimmers[i].pop();
+                console.log('PopOne Triggered')
+                return 1;
+            }
+        }
+    }
+}
 function FCStart() {
     //  To allow polling frequency to change, clear intervals before setting new ones.
 
