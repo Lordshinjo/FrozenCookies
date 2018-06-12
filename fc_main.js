@@ -798,7 +798,8 @@ function gcEfficiency() {
 }
 
 function delayAmount() {
-    return bestBank(nextChainedPurchase().efficiency).cost;
+    var purchase = nextChainedPurchase();
+    return bestBank(purchase ? purchase.efficiency : 0).cost;
     /*
       if (nextChainedPurchase().efficiency > gcEfficiency() || (Game.frenzy && Game.Has('Get lucky'))) {
         return maxLuckyValue() * 10;
