@@ -8,14 +8,14 @@ How to use
 
 ## Bookmarklet install
 
-1. Paste the *contents* (not the url) of https://rawgit.com/Lordshinjo/FrozenCookies/master/fc_bookmarklet_loader.js into a bookmark.
+1. Paste the *contents* (not the url) of https://rawgit.com/Mezmerro/FrozenCookies/master/fc_bookmarklet_loader.js into a bookmark.
 2. Load up Cookie Clicker.
 3. Load the recently created bookmark.
 
 ## Userscript install
 
 0. If you don't already have it, install the required browser add-on. [Tampermonkey (Chrome)](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en) or [Greasemonkey (Firefox)](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/)
-1. Go to https://rawgit.com/Lordshinjo/FrozenCookies/master/fc_bookmarklet_loader.js
+1. Go to https://rawgit.com/Mezmerro/FrozenCookies/master/fc_userscript_loader.user.js
 2. Click the 'install' button in the upper right corner.
 3. Load up Cookie Clicker.
 
@@ -37,6 +37,14 @@ What can Frozen Cookies do?
 
 What's new?
 -----------
+2018 Mar 2:
+- Updated to work in patch 2.0045
+- More auto-Godzamok behavior options
+- Auto Spell Casting (Conj. Baked Goods, Force the Hand of Fate, Spontaneous Edifice, and Haggler's Charm [the fastest to spam for spell achievements])
+- Wizard Tower purchase limit toggle to stay at 100 mana
+- Auto Sugar Lump Harvesting
+- Cursor Autobuy limit option to keep Godzamok efficient at very high cursor counts
+- Auto bulk purchase on reincarnation (option to automatically buy in 10s or 100s after reincarnation to speed up early run
 
 2017 Apr 14:
 - New option: FPS modifier

@@ -27,6 +27,9 @@ function setOverrides() {
     FrozenCookies.cookieClickSpeed = preferenceParse('cookieClickSpeed', 0);
     FrozenCookies.frenzyClickSpeed = preferenceParse('frenzyClickSpeed', 0);
     FrozenCookies.HCAscendAmount = preferenceParse('HCAscendAmount', 0);
+    FrozenCookies.minCpSMult = preferenceParse('minCpSMult', 1);
+    FrozenCookies.cursorMax = preferenceParse('cursorMax', 500);
+    FrozenCookies.manaMax = preferenceParse('nanaMax', 100);
 
     // Becomes 0 almost immediately after user input, so default to 0
     FrozenCookies.timeTravelAmount = 0;
@@ -87,6 +90,9 @@ function setOverrides() {
     FrozenCookies.caches.buildings = [];
     FrozenCookies.caches.upgrades = [];
 
+	//Whether to currently display achievement popups
+	FrozenCookies.showAchievements = true;
+
     if (!blacklist[FrozenCookies.blacklist]) {
         FrozenCookies.blacklist = 0;
     }
@@ -143,6 +149,7 @@ function scientificNotation(value) {
     return value;
 }
 
+
 var numberFormatters = [
     rawFormatter,
     formatEveryThirdPower([
@@ -161,7 +168,31 @@ var numberFormatters = [
         ' duodecillion',
         ' tredecillion',
         ' quattuordecillion',
-        ' quindecillion'
+        ' quindecillion',
+        ' sexdecillion',
+        ' septendecillion',
+        ' octodecillion',
+        ' novemdecillion',
+        ' vigintillion',
+        ' unvigintillion',
+        ' duovigintillion',
+        ' trevigintillion',
+        ' quattuorvigintillion',
+        ' quinvigintillion',
+        ' sexvigintillion',
+        ' septenvigintillion',
+        ' octovigintillion',
+        ' novemvigintillion',
+        ' trigintillion',
+        ' untrigintillion',
+        ' duotrigintillion',
+        ' tretrigintillion',
+        ' quattuortrigintillion',
+        ' quintrigintillion',
+        ' sextrigintillion',
+        ' septentrigintillion',
+        ' octotrigintillion',
+        ' novemtrigintillion'
     ]),
 
     formatEveryThirdPower([
@@ -180,7 +211,31 @@ var numberFormatters = [
         ' DoD',
         ' TrD',
         ' QaD',
-        ' QiD'
+        ' QiD',
+        ' SxD',
+        ' SpD',
+        ' OcD',
+        ' NoD',
+        ' Vg',
+        ' UnV',
+        ' DoV',
+        ' TrV',
+        ' QaV',
+        ' QiV',
+        ' SxV',
+        ' SpV',
+        ' OcV',
+        ' NoV',
+        ' Tg',
+        ' UnT',
+        ' DoT',
+        ' TrT',
+        ' QaT',
+        ' QiT',
+        ' SxT',
+        ' SpT',
+        ' OcT',
+        ' NoT'
     ]),
 
     formatEveryThirdPower([
@@ -280,12 +335,15 @@ function updateLocalStorage() {
     localStorage.frenzyClickSpeed = FrozenCookies.frenzyClickSpeed;
     localStorage.cookieClickSpeed = FrozenCookies.cookieClickSpeed;
     localStorage.HCAscendAmount = FrozenCookies.HCAscendAmount;
+    localStorage.cursorMax = FrozenCookies.cursorMax;
+    localStorage.minCpSMult = FrozenCookies.minCpSMult;
     localStorage.frenzyTimes = JSON.stringify(FrozenCookies.frenzyTimes);
     //  localStorage.nonFrenzyTime = FrozenCookies.non_gc_time;
     //  localStorage.frenzyTime = FrozenCookies.gc_time;
     localStorage.lastHCAmount = FrozenCookies.lastHCAmount;
     localStorage.maxHCPercent = FrozenCookies.maxHCPercent;
     localStorage.lastHCTime = FrozenCookies.lastHCTime;
+    localStorage.manaMax = FrozenCookies.manaMax;
     localStorage.prevLastHCTime = FrozenCookies.prevLastHCTime;
 }
 
@@ -378,6 +436,23 @@ function updateSpeed(base) {
     }
 }
 
+function getCpSMultMin(current) {
+    var newMin = prompt('What CpS multiplier should trigger Auto Casting (e.g. "7" will trigger when you have full mana and a Frenzy, "1" prevents triggering during a clot, etc.)?', current);
+    if (typeof(newMin) == 'undefined' || newMin == null || isNaN(Number(newMin)) || Number(newMin) < 0) {
+        newMin = current;
+    }
+    return Number(newMin);
+}
+
+function updateCpSMultMin(base) {
+    var newMin = getCpSMultMin(FrozenCookies[base]);
+    if (newMin != FrozenCookies[base]) {
+        FrozenCookies[base] = newMin;
+        updateLocalStorage();
+        FCStart();
+    }
+}
+
 function getAscendAmount(current) {
     current = 0;
     var newAmount = prompt('How many heavenly chips do you want to auto-ascend at?', current);
@@ -391,6 +466,40 @@ function updateAscendAmount(base) {
     var newAmount = getAscendAmount(FrozenCookies[base]);
     if (newAmount != FrozenCookies[base]) {
         FrozenCookies[base] = newAmount;
+        updateLocalStorage();
+        FCStart();
+    }
+}
+
+function getManaMax(current) {
+    var newMax = prompt('Set maximum mana: ', current);
+    if (typeof(newMax) == 'undefined' || newMax == null || isNaN(Number(newMax)) || Number(newMax < 0)) {
+        newMax = current;
+    }
+    return Number(newMax);
+}
+
+function updateManaMax(base) {
+    var newMax = getManaMax(FrozenCookies[base]);
+    if (newMax != FrozenCookies[base]) {
+        FrozenCookies[base] = newMax;
+        updateLocalStorage();
+        FCStart();
+    }
+}
+
+function getCursorMax(current) {
+    var newMax = prompt('How many Cursors should Autobuy stop at?', current);
+    if (typeof(newMax) == 'undefined' || newMax == null || isNaN(Number(newMax)) || Number(newMax < 0)) {
+        newMax = current;
+    }
+    return Number(newMax);
+}
+
+function updateCursorMax(base) {
+    var newMax = getCursorMax(FrozenCookies[base]);
+    if (newMax != FrozenCookies[base]) {
+        FrozenCookies[base] = newMax;
         updateLocalStorage();
         FCStart();
     }
@@ -434,6 +543,130 @@ function toggleFrozen(setting) {
     FCStart();
 }
 
+var T = Game.Objects['Temple'].minigame;
+var M = Game.Objects['Wizard tower'].minigame;
+
+function rigiSell() {
+    //Sell enough cursors to enable Rigidels effect
+    if (Game.BuildingsOwned%10) Game.Objects['Cursor'].sell(Game.BuildingsOwned%10);
+    return;
+}
+
+function lumpIn(mins) { //For debugging, set minutes until next lump is *ripe*
+    Game.lumpT = Date.now() - Game.lumpRipeAge + (60000*mins)
+}
+
+function swapIn(godId, targetSlot) { //mostly code copied from minigamePantheon.js, tweaked to avoid references to "dragging"
+    if (T.swaps == 0) return;
+    T.useSwap(1);
+    T.lastSwapT = 0;
+    var div  = l('templeGod' + godId);
+    var prev = T.slot[targetSlot] //id of God currently in slot
+    if (prev != -1) { //when something's in there already
+        prev = T.godsById[prev]; //prev becomes god object
+        var prevDiv = l('templeGod' + prev.id);
+        if (T.godsById[godId].slot != -1) l('templeSlot' + T.godsById[godId].slot).appendChild(prevDiv);
+        else {
+            var other = l('templeGodPlaceholder'+(prev.id));
+            other.parentNode.insertBefore(prevDiv, other);
+        }
+    }
+    l('templeSlot' + targetSlot).appendChild(l('templeGod' + godId));
+    T.slotGod(T.godsById[godId], targetSlot);
+    
+    PlaySound('snd/tick.mp3');
+    PlaySound('snd/spirit.mp3');
+         
+    var rect=l('templeGod' + godId).getBoundingClientRect();
+    Game.SparkleAt((rect.left+rect.right)/2,(rect.top+rect.bottom)/2-24);
+}
+
+
+
+function autoRigidel() {
+    if (!T) return; //Exit if pantheon doesnt even exist
+    var timeToRipe = (Game.lumpRipeAge - (Date.now() - Game.lumpT))/60000; //Minutes until sugar lump ripens
+    var orderLvl = Game.hasGod('order') ? Game.hasGod('order') : 0;
+    switch (orderLvl) {
+        case 0: //Rigidel isn't in a slot
+            if (T.swaps < 2 || (T.swaps == 1 && T.slot[0] == -1) ) return; //Don't do anything if we can't swap Rigidel in
+            if (timeToRipe < 60) {
+                var prev = T.slot[0] //cache whatever god you have equipped
+                swapIn(10,0); //swap in rigidel
+                Game.computeLumpTimes();
+                rigiSell(); //Meet the %10 condition
+                Game.clickLump(); //harvest the ripe lump, AutoSL probably covers this but this should avoid issues with autoBuy going first and disrupting Rigidel
+                if (prev != -1) swapIn(prev, 0); //put the old one back
+            }
+        case 1: //Rigidel is already in diamond slot
+            if(timeToRipe < 60 && Game.BuildingsOwned%10) {
+                rigiSell();
+                Game.computeLumpTimes();
+                Game.clickLump();
+            }
+        case 2: //Rigidel in Ruby slot,
+            if(timeToRipe < 40 && Game.BuildingsOwned%10) {
+                rigiSell();
+                Game.computeLumpTimes();
+                Game.clickLump();
+            }
+        case 3: //Rigidel in Jade slot
+            if (timeToRipe < 20 && Game.BuildingsOwned%10) {
+                rigiSell();
+                Game.computeLumpTimes();
+                Game.clickLump();
+            }
+    }
+}
+                
+            
+            
+        
+        
+function autoCast() {
+    if (!M) return; //Just leave if you don't have grimoire
+    if (M.magic == M.magicM) {
+        switch (FrozenCookies.autoSpell) {
+            case 0:
+                return;
+            case 1:
+                var CBG = M.spellsById[0];
+                if (M.magicM < Math.floor(CBG.costMin + CBG.costPercent*M.magicM)) return;
+                if(cpsBonus() >= FrozenCookies.minCpSMult) {
+                    M.castSpell(CBG);
+                    logEvent('AutoSpell', 'Cast Conjure Baked Goods');
+                }
+                return;
+            case 2:
+                var FTHOF = M.spellsById[1];
+                if (M.magicM < Math.floor(FTHOF.costMin + FTHOF.costPercent*M.magicM)) return;
+                if(cpsBonus() >= FrozenCookies.minCpSMult || Game.hasBuff('Dragonflight') || Game.hasBuff('Click frenzy')) {
+                    M.castSpell(FTHOF);
+                    logEvent('AutoSpell', 'Cast Force the Hand of Fate');
+                }
+                return;
+            case 3:
+                var SE = M.spellsById[3];
+                //If you don't have any chancemakers yet, or can't cast SE, just give up.
+                if (Game.Objects['Chancemaker'].amount == 0 || M.magicM < Math.floor(SE.costMin + SE.costPercent*M.magicM)) return;
+                //If we have over 400 CM, always going to sell down to 399. If you don't have half a Chancemaker in bank, sell one
+                while (Game.Objects['Chancemaker'].amount >= 400 || Game.cookies < Game.Objects['Chancemaker'].price/2) {
+                   Game.Objects['Chancemaker'].sell(1);
+                   logEvent('Store', 'Sold 1 Chancemaker for ' + Beautify(Game.Objects['Chancemaker'].price*1.15*.85));
+                }
+                M.castSpell(SE);
+                logEvent('AutoSpell', 'Cast Spontaneous Edifice');
+                return;
+            case 4:
+                var hagC = M.spellsById[4];
+                if (M.magicM < Math.floor(hagC.costMin + hagC.costPercent*M.magicM)) return;
+                M.castSpell(hagC);
+                logEvent('AutoSpell', 'Cast Haggler\'s Charm');
+                return;
+        }
+    }
+}
+    
 function autoBlacklistOff() {
     switch (FrozenCookies.blacklist) {
         case 1:
@@ -480,6 +713,16 @@ function clickBuffBonus() {
         // Devastation, Godzamok's buff, is too variable
         if (typeof Game.buffs[i].multClick != 'undefined' && Game.buffs[i].name != 'Devastation') {
             ret *= Game.buffs[i].multClick;
+        }
+    }
+    return ret;
+}
+
+function cpsBonus() {
+    var ret = 1
+    for (var i in Game.buffs) {
+        if (typeof Game.buffs[i].multCpS != 'undefined') {
+            ret *= Game.buffs[i].multCpS;
         }
     }
     return ret;
@@ -688,6 +931,16 @@ function estimatedTimeRemaining(cookies) {
     return timeDisplay(cookies / effectiveCps());
 }
 
+function canCastSE() {
+    if (M.magicM >= 80 && Game.Objects['Chancemaker'].amount > 0) return 1;
+    return 0;
+}
+
+function edificeBank() {
+    if (!canCastSE) return 0;
+    var cmCost = Game.Objects['Chancemaker'].price;
+    return Game.hasBuff('everything must go') ? (cmCost * (100/95))/2 : cmCost/2;
+}
 function luckyBank() {
     return baseCps() * 60 * 100;
 }
@@ -724,7 +977,8 @@ function cookieEfficiency(startingPoint, bankAmount) {
 
 function bestBank(minEfficiency) {
     var results = {};
-    var bankLevels = [0, luckyBank(), luckyFrenzyBank(), chainBank()].sort(function(a, b) {
+    var edifice = ((FrozenCookies.autoSpell == 3 || FrozenCookies.holdSEBank) ?  edificeBank() : 0);
+    var bankLevels = [0, luckyBank(), luckyFrenzyBank()].sort(function(a, b) {
         return b - a;
     }).map(function(bank) {
         return {
@@ -734,7 +988,13 @@ function bestBank(minEfficiency) {
     }).filter(function(bank) {
         return (bank.efficiency >= 0 && bank.efficiency <= minEfficiency) ? bank : null;
     });
-    return bankLevels[0];
+    if (bankLevels[0].cost > edifice) {
+        return bankLevels[0];
+    }
+    return {
+        'cost': edifice,
+        'efficiency': 1
+    };
 }
 
 function weightedCookieValue(useCurrent) {
@@ -845,6 +1105,7 @@ function purchaseEfficiency(price, deltaCps, baseDeltaCps, currentCps) {
 
 function recommendationList(recalculate) {
     if (recalculate) {
+		FrozenCookies.showAchievements=false;
         FrozenCookies.caches.recommendationList = addScores(
             upgradeStats(recalculate)
             .concat(buildingStats(recalculate))
@@ -852,10 +1113,36 @@ function recommendationList(recalculate) {
             .sort(function(a, b) {
                 return a.efficiency != b.efficiency ? a.efficiency - b.efficiency : (a.delta_cps != b.delta_cps ? b.delta_cps - a.delta_cps : a.cost - b.cost);
             }));
+        //If autocasting Spontaneous Edifice, don't buy any Chancemakers after 399
+        if (M && FrozenCookies.autoSpell == 3 && Game.Objects['Chancemaker'].amount >= 399) {
+            for (var i = 0; i < FrozenCookies.caches.recommendationList.length; i++) {
+                if (FrozenCookies.caches.recommendationList[i].id == 14) {
+                    FrozenCookies.caches.recommendationList.splice(i , 1);
+                }
+            }
+        }
+        //Stop buying wizard towers at max Mana if enabled
+        if (M && FrozenCookies.towerLimit && M.magicM >= FrozenCookies.manaMax) {
+            for (var i = 0; i < FrozenCookies.caches.recommendationList.length; i++) {
+                if (FrozenCookies.caches.recommendationList[i].id == 7) {
+                    FrozenCookies.caches.recommendationList.splice(i , 1);
+                }
+            }
+        }
+        //Stop buying Cursors if at set limit
+        if (FrozenCookies.cursorLimit && Game.Objects['Cursor'].amount >= FrozenCookies.cursorMax) {
+            for (var i = 0; i < FrozenCookies.caches.recommendationList.length; i++) {
+                if (FrozenCookies.caches.recommendationList[i].id == 0) {
+                    FrozenCookies.caches.recommendationList.splice(i, 1);
+                }
+            }
+        }
         if (FrozenCookies.pastemode) {
             FrozenCookies.caches.recommendationList.reverse();
         }
+		FrozenCookies.showAchievements=true;
     }
+	
     return FrozenCookies.caches.recommendationList;
     //  return upgradeStats(recalculate).concat(buildingStats(recalculate)).sort(function(a,b){return (a.efficiency - b.efficiency)});
 }
@@ -887,6 +1174,7 @@ function addScores(recommendations) {
 
 function nextPurchase(recalculate) {
     if (recalculate) {
+		FrozenCookies.showAchievements=false;
         var recList = recommendationList(recalculate);
         var purchase = null;
         var target = null;
@@ -912,6 +1200,7 @@ function nextPurchase(recalculate) {
             FrozenCookies.caches.nextPurchase = defaultPurchase();
             FrozenCookies.caches.nextChainedPurchase = defaultPurchase();
         }
+		FrozenCookies.showAchievements=true;
     }
     return FrozenCookies.caches.nextPurchase;
     //  return purchase;
@@ -924,6 +1213,7 @@ function nextChainedPurchase(recalculate) {
 
 function buildingStats(recalculate) {
     if (recalculate) {
+		FrozenCookies.showAchievements=false;
         var buildingBlacklist = blacklist[FrozenCookies.blacklist].buildings;
         var currentBank = bestBank(0).cost;
         FrozenCookies.caches.buildings = Game.ObjectsById.map(function(current, index) {
@@ -954,12 +1244,14 @@ function buildingStats(recalculate) {
         }).filter(function(a) {
             return a;
         });
+		FrozenCookies.showAchievements=true;
     }
     return FrozenCookies.caches.buildings;
 }
 
 function upgradeStats(recalculate) {
     if (recalculate) {
+		FrozenCookies.showAchievements=false;
         var upgradeBlacklist = blacklist[FrozenCookies.blacklist].upgrades;
         var currentBank = bestBank(0).cost;
         FrozenCookies.caches.upgrades = Game.UpgradesById.map(function(current) {
@@ -998,6 +1290,7 @@ function upgradeStats(recalculate) {
         }).filter(function(a) {
             return a;
         });
+		FrozenCookies.showAchievements=true;
     }
     return FrozenCookies.caches.upgrades;
 }
@@ -1016,6 +1309,18 @@ function isUnavailable(upgrade, upgradeBlacklist) {
 
     if (upgrade.id == 331) {
         result = true; // blacklist golden switch from being used, until proper logic can be implemented
+    }
+    
+    if (upgrade.id == 333) {
+        result = true; // blacklist milk selector from being used
+    }
+    
+    if (upgrade.id == 414) {
+        result = true; // blacklist background selector from being used
+    }
+
+    if (upgrade.id == 361) {
+        result = true; // blacklist golden cookie sound selector from being used
     }
 
     return result;
@@ -1292,6 +1597,7 @@ function buildingToggle(building, achievements) {
 }
 
 function buyFunctionToggle(upgrade) {
+    if (upgrade && upgrade.id==452) return null;
     if (upgrade && !upgrade.length) {
         if (!upgrade.buyFunction) {
             return null;
@@ -1562,14 +1868,23 @@ function doTimeTravel() {
       }
     */
 }
-
+//Why the hell is fcWin being called so often? It seems to be getting called repeatedly on the CPS achievements, 
+//which should only happen when you actually win them?
 function fcWin(what) {
     if (typeof what === 'string') {
         if (Game.Achievements[what]) {
             if (Game.Achievements[what].won == 0) {
+                var achname=Game.Achievements[what].shortName?Game.Achievements[what].shortName:Game.Achievements[what].name;
                 Game.Achievements[what].won = 1;
+                //This happens a ton of times on CPS achievements; it seems like they would be CHECKED for, but a degbug message placed
+                //here gets repeatedly called seeming to indicate that the achievements.won value is 1, even though the achievement isn't
+                //being unlocked. This also means that placing a function to log the achievement spams out messages. Are the Achievement.won
+                //values being turned off before the game checks again? There must be some reason Game.Win is replaced with fcWin
                 if (!FrozenCookies.disabledPopups) {
                     logEvent('Achievement', 'Achievement unlocked :<br>' + Game.Achievements[what].name + '<br> ', true);
+                }
+                if (FrozenCookies.showAchievements) {
+                    Game.Notify('Achievement unlocked','<div class="title" style="font-size:18px;margin-top:-2px;">'+achname+'</div>',Game.Achievements[what].icon);
                 }
                 if (Game.Achievements[what].pool != 'shadow') {
                     Game.AchievementsOwned++;
@@ -1578,6 +1893,7 @@ function fcWin(what) {
             }
         }
     } else {
+        logEvent('fcWin Else condition');
         for (var i in what) {
             Game.Win(what[i]);
         }
@@ -1667,9 +1983,10 @@ function shouldPopWrinklers() {
             });
         } else {
             var delay = delayAmount();
+            var wrinklerList = (FrozenCookies.shinyPop == 0) ? Game.wrinklers.filter(v => v.type == 0) : Game.wrinklers;
             var nextRecNeeded = nextPurchase().cost + delay - Game.cookies;
             var nextRecCps = nextPurchase().delta_cps;
-            var wrinklersNeeded = Game.wrinklers.sort(function(w1, w2) {
+            var wrinklersNeeded = wrinklerList.sort(function(w1, w2) {
                 return w1.sucked < w2.sucked
             }).reduce(function(current, w) {
                 var futureWrinklers = living.length - (current.ids.length + 1);
@@ -1710,7 +2027,7 @@ function autoGSBuy() {
             !Game.Upgrades['Golden switch [off]'].bought) {
             Game.Upgrades['Golden switch [off]'].buy();
         }
-    } else if (!Game.hasBuff('Frenzy')) {
+    } else if (cpsBonus() <= 1) {
         if (Game.Upgrades['Golden switch [on]'].unlocked &&
             !Game.Upgrades['Golden switch [on]'].bought) {
             Game.CalculateGains(); // Ensure price is updated since Frenzy ended
@@ -1720,8 +2037,12 @@ function autoGSBuy() {
 }
 
 function autoGodzamokAction() {
-    if (Game.hasGod('ruin') && Game.Objects['Cursor'].amount > 10 && hasClickBuff()) {
-        Game.Objects['Cursor'].sell(Game.Objects['Cursor'].amount);
+    if (!T) return; //Just leave if Pantheon isn't here yet
+    //Now has option to not trigger until current Devastation buff expires (i.e. won't rapidly buy & sell cursors throughout Godzamok duration)
+    if (Game.hasGod('ruin') && Game.Objects['Cursor'].amount > 10 && (!Game.hasBuff('Devastation') || FrozenCookies.autoGodzamok == 1 || FrozenCookies.autoGodzamok == 3) && hasClickBuff()) {
+        var count = Game.Objects['Cursor'].amount;
+        Game.Objects['Cursor'].sell(count);
+        if (FrozenCookies.autoGodzamok > 1) Game.Objects['Cursor'].buy(count);
     }
 }
 
@@ -1750,6 +2071,7 @@ function fcClickCookie() {
 }
 
 function autoCookie() {
+    //console.log('autocookie called');
     if (!FrozenCookies.processing && !Game.OnAscend && !Game.AscendTimer) {
         FrozenCookies.processing = true;
         var currentHCAmount = Game.HowMuchPrestige(Game.cookiesEarned + Game.cookiesReset + wrinklerValue());
@@ -1772,6 +2094,14 @@ function autoCookie() {
         if (FrozenCookies.timeTravelAmount) {
             doTimeTravel();
         }
+        if (FrozenCookies.autoSL) {
+             var started = Game.lumpT;
+             var ripeAge = Game.lumpRipeAge;
+             if ((Date.now() - started) >= ripeAge) {
+                 Game.clickLump();
+             }
+        }
+        if (FrozenCookies.autoSL == 2) autoRigidel();
         if (FrozenCookies.autoWrinkler == 1) {
             var popCount = 0;
             var popList = shouldPopWrinklers();
@@ -1800,9 +2130,20 @@ function autoCookie() {
         }
 
         var itemBought = false;
-
-        if (FrozenCookies.autoBuy && (Game.cookies >= delay + recommendation.cost) && (FrozenCookies.pastemode || isFinite(nextChainedPurchase().efficiency))) {
+        //Automatically buy in bulk if setting turned on
+        if (FrozenCookies.autoBulk != 0){
+            if (FrozenCookies.autoBulk == 1){ //Buy x10
+                document.getElementById('storeBulk10').click();
+            }
+            if (FrozenCookies.autoBulk == 2){ //Buy x100
+                document.getElementById('storeBulk100').click();
+            }
+        }         
+        
+        //var seConditions = (Game.cookies >= delay + recommendation.cost) || (!(FrozenCookies.autoSpell == 3) && !(FrozenCookies.holdSEBank))); //true == good on SE bank or don't care about it
+        if (FrozenCookies.autoBuy && ((Game.cookies >= delay + recommendation.cost) || recommendation.purchase.name == "Elder Pledge") && (FrozenCookies.pastemode || isFinite(nextChainedPurchase().efficiency))) {
             //    if (FrozenCookies.autoBuy && (Game.cookies >= delay + recommendation.cost)) {
+            //console.log('something should get bought');
             recommendation.time = Date.now() - Game.startDate;
             //      full_history.push(recommendation);  // Probably leaky, maybe laggy?
             recommendation.purchase.clickFunction = null;
@@ -1836,7 +2177,7 @@ function autoCookie() {
                 setTimeout(function() {
                     Game.ClosePrompt();
                     Game.Reincarnate(1);
-                }, 5000);
+                }, 10000);
             }
         }
 
@@ -1960,6 +2301,10 @@ function FCStart() {
 
     if (FrozenCookies.autoGodzamok) {
         FrozenCookies.autoGodzamokBot = setInterval(autoGodzamokAction, FrozenCookies.frequency)
+    }
+    
+    if(FrozenCookies.autoSpell) {
+        setInterval(autoCast, FrozenCookies.frequency*10)
     }
 
     if (statSpeed(FrozenCookies.trackStats) > 0) {
